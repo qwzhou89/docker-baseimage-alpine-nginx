@@ -1,15 +1,12 @@
+limit_conn_zone $binary_remote_addr zone=addr:10m;
+
 server {
 	listen 80 default_server;
-
-	listen 443 ssl;
 
 	root /config/www;
 	index index.html index.htm index.php;
 
 	server_name _;
-
-	ssl_certificate /config/keys/cert.crt;
-	ssl_certificate_key /config/keys/cert.key;
 
 	client_max_body_size 0;
 
@@ -17,14 +14,12 @@ server {
 		try_files $uri $uri/ /index.html /index.php?$args =404;
 	}
 
-	location ~ \.php$ {
-		fastcgi_split_path_info ^(.+\.php)(/.+)$;
-		# With php5-cgi alone:
-		fastcgi_pass 127.0.0.1:9000;
-		# With php5-fpm:
-		#fastcgi_pass unix:/var/run/php5-fpm.sock;
-		fastcgi_index index.php;
-		include /etc/nginx/fastcgi_params;
-
-	}
+    # node's history ledger data.Don't remove
+    location /led/ {
+      limit_conn addr 1; # 每个客户端只允许一个线程
+      limit_rate 100k; # 每个线程最大下载速度100k
+      alias /data/node-ledger/;
+      access_log off;
+      error_log stderr;
+    }
 }

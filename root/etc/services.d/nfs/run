@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bash
+
+mkdir -p "$MOUNTPOINT"
+/sbin/rpcbind -f &
+/bin/mount -t "$FSTYPE" -o "$MOUNT_OPTIONS" "$SERVER:$SHARE" "$MOUNTPOINT"
